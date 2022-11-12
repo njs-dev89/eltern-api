@@ -8,6 +8,7 @@ import connectDB from "./src/config/db.js";
 
 //Routes imports
 import userRoutes from "./src/routes/user.routes.js";
+import topicRoutes from "./src/routes/topic.routes.js";
 import { errorHandler, notFound } from "./src/middlewares/error.middleware.js";
 import { fileURLToPath } from "url";
 
@@ -26,6 +27,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/v1", userRoutes);
+app.use("/api/v1/topics", topicRoutes);
 
 app.use(notFound);
 

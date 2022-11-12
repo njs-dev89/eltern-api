@@ -24,10 +24,10 @@ const registerUser = asyncHandler(async (req, res) => {
 
   if (user) {
     delete user.password;
-    user.token = generateToken(user._id);
+
     res.status(201).json({
       success: true,
-      data: user,
+      data: { user, token: generateToken(user._id) },
       message: null,
     });
   } else {
