@@ -1,11 +1,40 @@
-const express = require("express");
+// Installed Packages imports
+import express from "express";
+import dotenv from "dotenv";
+import path from "path";
+
+// Local modules imports
+import connectDB from "./src/config/db.js";
+
+//Routes imports
+import userRoutes from "./src/routes/user.routes.js";
+import { errorHandler, notFound } from "./src/middlewares/error.middleware.js";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+dotenv.config();
 const app = express();
-const port = 3000;
+
+app.use(express.json());
+
+app.use(express.static(path.join(__dirname, "/src", "/static")));
 
 app.get("/", (req, res) => {
   res.send("Hello World!!");
 });
 
-app.listen(port, () => {
-  console.log(`Server listening on port ${port}`);
+app.use("/api/v1", userRoutes);
+
+app.use(notFound);
+
+app.use(errorHandler);
+
+const port = process.env.PORT || 3000;
+
+connectDB(() => {
+  app.listen(port, () => {
+    console.log(`Server listening on port ${port}`);
+  });
 });
