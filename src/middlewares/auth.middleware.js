@@ -26,4 +26,12 @@ const protect = asyncHandler(async (req, res, next) => {
   }
 });
 
-export { protect };
+const isAdmin = (req, res, next) => {
+  if (!req.user.isAdmin) {
+    res.status(403);
+    throw new Error("Forbidden, not an admin");
+  }
+  next();
+};
+
+export { protect, isAdmin };

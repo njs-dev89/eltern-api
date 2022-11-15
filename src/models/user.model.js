@@ -1,10 +1,10 @@
 import { model, Schema } from "mongoose";
 import bcrypt from "bcrypt";
 
-const nonRelevantTopicSchema = new Schema({
-  topicId: { type: Schema.Types.ObjectId, required: true },
-  nonRelevantSubTopics: [{ type: Schema.Types.ObjectId }],
-});
+// const nonRelevantTopicSchema = new Schema({
+//   topicId: { type: Schema.Types.ObjectId, required: true },
+//   nonRelevantSubTopics: [{ type: Schema.Types.ObjectId }],
+// });
 
 const userSchema = new Schema(
   {
@@ -29,10 +29,11 @@ const userSchema = new Schema(
     },
     relevantPeriod: [
       {
-        type: String,
+        type: Schema.Types.ObjectId,
+        ref: "Period",
       },
     ],
-    nonRelevantTopics: nonRelevantTopicSchema,
+    // nonRelevantTopics: nonRelevantTopicSchema,
     enableNotifications: {
       type: Boolean,
       required: true,

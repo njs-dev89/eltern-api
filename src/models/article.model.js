@@ -26,6 +26,12 @@ const articleSchema = new Schema({
       ref: "User",
     },
   ],
+  nonRelevantUsers: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+    },
+  ],
   published: {
     type: Boolean,
     required: true,
