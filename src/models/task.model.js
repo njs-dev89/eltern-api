@@ -59,6 +59,11 @@ taskSchema.virtual("taskStatus", {
   localField: "_id",
   foreignField: "taskId",
 });
+taskSchema.virtual("subTasks", {
+  ref: "Task",
+  localField: "_id",
+  foreignField: "parent",
+});
 
 const Task = model("Task", taskSchema);
 

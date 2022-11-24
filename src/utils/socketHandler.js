@@ -14,6 +14,10 @@ const socketHandler = async (socket) => {
     socket.join(msg.roomId);
     console.log(`Room ${msg.roomId} joined`);
   });
+  socket.on("leave room", (msg) => {
+    socket.leave(msg.roomId);
+    console.log(`Room ${msg.roomId} Leaved`);
+  });
 
   socket.on("message from admin", async (msg) => {
     msg.timeSent = new Date();

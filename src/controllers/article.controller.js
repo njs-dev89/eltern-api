@@ -4,6 +4,7 @@ import Jimp from "jimp";
 import Article from "../models/article.model.js";
 import Period from "../models/period.model.js";
 import Topic from "../models/topic.model.js";
+import { Types } from "mongoose";
 
 const imageUpload = multer({
   storage: multer.memoryStorage(),
@@ -134,6 +135,30 @@ const markArticleRead = asyncHandler(async (req, res) => {
   res.json({ success: true, message: null, data: updatedArticle });
 });
 
+const markArticleFavourite = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const updatedArticle = await Article.findByIdAndUpdate(
+    id,
+    {
+      $addToSet: { usersLiked: req.user._id },
+    },
+    { new: true }
+  );
+  res.json({ success: true, message: null, data: updatedArticle });
+});
+
+const unmarkArticleFavourite = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const updatedArticle = await Article.findByIdAndUpdate(
+    id,
+    {
+      $pull: { usersLiked: req.user._id },
+    },
+    { new: true }
+  );
+  res.json({ success: true, message: null, data: updatedArticle });
+});
+
 const getFeed = asyncHandler(async (req, res) => {
   const { skip, limit } = req.query;
   console.log(req.user._id);
@@ -165,6 +190,35 @@ const getFeed = asyncHandler(async (req, res) => {
   res.json({ success: true, data: feed, message: null });
 });
 
+const getSingleArticle = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const article = await Article.findById(id)
+    .populate("relatedTasks")
+    .populate("relatedArticles");
+  // const article = await Article.aggregate([
+  //   { $match: { _id: { $eq: Types.ObjectId(id) } } },
+  //   {
+  //     $lookup: {
+  //       from: "tasks",
+  //       localField: "_id",
+  //       foreignField: "articles",
+  //       as: "relatedTasks",
+  //     },
+  //   },
+  // ]);
+  res.json({ success: true, data: article, message: null });
+});
+
+const getTopicArticles = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { limit, skip } = req.query;
+
+  const articles = await Article.find({ topic: id })
+    .skip(Number(skip))
+    .limit(Number(limit));
+  res.json({ success: true, data: articles, message: null });
+});
+
 export {
   createArticle,
   updateArticle,
@@ -172,7 +226,11 @@ export {
   resizeImg,
   deleteArticle,
   getFeed,
+  getSingleArticle,
   markArticleIrrelevant,
   unmarkArticleIrrelevant,
   markArticleRead,
+  markArticleFavourite,
+  unmarkArticleFavourite,
+  getTopicArticles,
 };

@@ -11,17 +11,24 @@ const createTask = asyncHandler(async (req, res) => {
   if (!req.user.isAdmin) {
     req.body.isAdminTask = false;
     req.body.user = req.user._id;
+    if (req.articles) {
+      delete req.articles;
+    }
   }
   const task = await Task.create(req.body);
   if (!task) {
     res.status(400);
     throw new Error("Invalid task data");
   }
+  if (req.user.isAdmin) {
+    return res.status(201).json({ success: true, data: task, message: null });
+  }
   const taskStatusData = {
     taskId: task._id,
     start: task.recommendedStart,
     end: task.recommendedEnd,
     status: "Open",
+    user: req.user._id,
   };
   if (noteText) {
     taskStatusData.note.text = noteText;
@@ -67,11 +74,13 @@ const customizeTask = asyncHandler(async (req, res) => {
   let taskStatus;
   const { id } = req.params;
   const { statusId } = req.query;
+  console.log(id);
   const taskStatusData = {
     taskId: id,
     start: req.body.start,
     end: req.body.end,
     status: req.body.status,
+    user: req.user._id,
   };
   if (req.body.noteText) {
     taskStatusData.note.text = req.body.noteText;
@@ -126,7 +135,7 @@ const getTasks = asyncHandler(async (req, res) => {
   let tasks;
   const { filter } = req.query;
   if (filter === "all") {
-    tasks = Task.find({ parent: { $eq: null } }).populate({
+    tasks = await Task.find({ parent: { $eq: null } }).populate({
       path: "taskStatus",
       match: { user: { $eq: req.user._id } },
       options: { sort: { end: 1 } },
@@ -223,9 +232,22 @@ const getTasks = asyncHandler(async (req, res) => {
   res.json({ success: true, data: tasks, message: null });
 });
 
+const getSingleTask = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const task = await Task.findById(id)
+    .populate("taskStatus")
+    .populate("subTasks");
+  if (!task) {
+    res.status(404);
+    throw new Error("No task found with id " + id);
+  }
+  res.json({ success: true, data: task, message: null });
+});
+
 export {
   createTask,
   getTasks,
+  getSingleTask,
   startTask,
   customizeTask,
   completeTask,

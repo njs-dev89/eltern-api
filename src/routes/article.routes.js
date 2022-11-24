@@ -3,10 +3,14 @@ import {
   createArticle,
   deleteArticle,
   getFeed,
+  getSingleArticle,
+  getTopicArticles,
   imageUpload,
+  markArticleFavourite,
   markArticleIrrelevant,
   markArticleRead,
   resizeImg,
+  unmarkArticleFavourite,
   unmarkArticleIrrelevant,
   updateArticle,
 } from "../controllers/article.controller.js";
@@ -20,10 +24,14 @@ router
   .post(protect, imageUpload, resizeImg, createArticle);
 router
   .route("/:id")
+  .get(protect, getSingleArticle)
   .put(protect, imageUpload, resizeImg, updateArticle)
   .delete(protect, deleteArticle);
+router.route("/topic/:id").get(protect, getTopicArticles);
 router.route("/markIrrelevant/:id").patch(protect, markArticleIrrelevant);
 router.route("/unmarkIrrelevant/:id").patch(protect, unmarkArticleIrrelevant);
 router.route("/markRead/:id").patch(protect, markArticleRead);
+router.route("/markFavourite/:id").patch(protect, markArticleFavourite);
+router.route("/unmarkFavourite/:id").patch(protect, unmarkArticleFavourite);
 
 export default router;
