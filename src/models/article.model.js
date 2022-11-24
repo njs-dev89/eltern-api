@@ -9,11 +9,25 @@ const articleSchema = new Schema({
     type: String,
     required: true,
   },
+  imgLink: { type: String },
   topic: {
     type: Schema.Types.ObjectId,
     required: true,
     ref: "Topic",
   },
+  start: {
+    type: Number,
+    required: true,
+    min: -280,
+    max: 364,
+  },
+  end: {
+    type: Number,
+    required: true,
+    min: -279,
+    max: 365,
+  },
+  periods: [{ type: Schema.Types.ObjectId, ref: "Period" }],
   usersLiked: [
     {
       type: Schema.Types.ObjectId,
@@ -26,10 +40,16 @@ const articleSchema = new Schema({
       ref: "User",
     },
   ],
-  nonRelevantUsers: [
+  irrelevantUsers: [
     {
       type: Schema.Types.ObjectId,
       ref: "User",
+    },
+  ],
+  articles: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Article",
     },
   ],
   published: {

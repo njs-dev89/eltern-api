@@ -113,11 +113,26 @@ const deleteProfile = asyncHandler(async (req, res) => {
     message: null,
   });
 });
+
+const getAllUsers = asyncHandler(async (req, res) => {
+  console.log("Route called");
+  const users = await User.find({}).select("-password");
+  if (users.length === 0) {
+    console.log("No users found");
+    return res.json({
+      success: true,
+      data: [{ username: "unknown" }],
+      message: null,
+    });
+  }
+  res.json({ success: true, data: users, message: null });
+});
 export {
   registerUser,
   authUser,
   getUserProfile,
   deleteProfile,
+  getAllUsers,
   uploadAvatar,
   resizeAvatar,
   updateUserProfile,

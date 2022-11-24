@@ -58,4 +58,20 @@ const deletePeriod = asyncHandler(async (req, res) => {
   });
 });
 
-export { createPeriod, getPeriods, deletePeriod };
+const getCurrentPeriod = asyncHandler(async (req, res) => {
+  const date = new Date();
+  if (!req.user.expectedBirthDate) {
+    res.status(400);
+    throw new Error("You haven't added expected birth date");
+  }
+  const days = (date - req.user.expectedBirthDate) / (1000 * 60 * 60 * 24);
+  //   res.json({ date, days });
+  const period = await Period.findOne({
+    start: { $lte: days },
+    end: { $gte: days },
+  });
+
+  res.json({ success: true, data: period, message: null });
+});
+
+export { createPeriod, getPeriods, deletePeriod, getCurrentPeriod };
