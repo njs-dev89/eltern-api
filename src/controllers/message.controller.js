@@ -53,6 +53,7 @@ const getRoomMessages = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { limit, skip } = req.query;
   const messages = await Message.find({ roomId: id })
+    .populate("postedBy", "username avatar")
     .sort({ timeSent: -1 })
     .limit(limit)
     .skip(skip);
