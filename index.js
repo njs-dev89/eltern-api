@@ -18,6 +18,7 @@ import periodRoutes from "./src/routes/period.routes.js";
 import topicRoutes from "./src/routes/topic.routes.js";
 import articleRoutes from "./src/routes/article.routes.js";
 import taskRoutes from "./src/routes/task.routes.js";
+import messageRoutes from "./src/routes/message.routes.js";
 import { errorHandler, notFound } from "./src/middlewares/error.middleware.js";
 import { generateIdHash } from "./src/services/notification.service.js";
 import { protect } from "./src/middlewares/auth.middleware.js";
@@ -46,6 +47,7 @@ app.use("/api/v1/periods", periodRoutes);
 app.use("/api/v1/topics", topicRoutes);
 app.use("/api/v1/articles", articleRoutes);
 app.use("/api/v1/tasks", taskRoutes);
+app.use("/api/v1/messages", messageRoutes);
 
 app.use(notFound);
 
