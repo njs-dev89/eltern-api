@@ -90,7 +90,7 @@ const resizeAvatar = asyncHandler(async (req, res, next) => {
 
 const updateUserProfile = asyncHandler(async (req, res) => {
   const user = req.user;
-  if (req.body.avatar && user.avatar !== "/static/images/profile-image.jpg") {
+  if (req.body.avatar && user.avatar !== "/images/profile-image.jpg") {
     fs.unlink(path.join(__dirname, "../static", user.avatar), (err) => {
       console.log(err);
     });

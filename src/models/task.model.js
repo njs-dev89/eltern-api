@@ -10,13 +10,13 @@ const taskSchema = new Schema(
     description: { type: String },
     recommendedStart: {
       type: Number,
-      required: true,
+      // required: true,
       min: -280,
       max: 364,
     },
     recommendedEnd: {
       type: Number,
-      required: true,
+      // required: true,
       min: -279,
       max: 365,
     },

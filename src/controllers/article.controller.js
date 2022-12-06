@@ -193,6 +193,7 @@ const getFeed = asyncHandler(async (req, res) => {
 const getSingleArticle = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const article = await Article.findById(id)
+    .populate({ path: "reviews.user", select: "username avatar" })
     .populate("relatedTasks")
     .populate("relatedArticles");
   // const article = await Article.aggregate([
@@ -219,6 +220,40 @@ const getTopicArticles = asyncHandler(async (req, res) => {
   res.json({ success: true, data: articles, message: null });
 });
 
+const createReview = asyncHandler(async (req, res) => {
+  const { rating, comment } = req.body;
+
+  const article = await Article.findById(req.params.id);
+  if (!article) {
+    res.status(404);
+    throw new Error("Article not found");
+  }
+  const alreadyReviewed = article.reviews.find(
+    (rev) => rev.user.toString() === req.user._id.toString()
+  );
+  if (alreadyReviewed) {
+    res.status(400);
+    throw new Error("Article already reviewed");
+  }
+
+  const review = {
+    user: req.user._id,
+    rating: Number(rating),
+    comment,
+  };
+
+  article.reviews.push(review);
+  article.numReviews = article.reviews.length;
+  article.rating =
+    article.reviews.reduce((acc, item) => {
+      return item.rating + acc;
+    }, 0) / article.reviews.length;
+  console.log(article.reviews);
+  await article.save();
+
+  res.json({ success: true, message: null, data: article });
+});
+
 export {
   createArticle,
   updateArticle,
@@ -233,4 +268,5 @@ export {
   markArticleFavourite,
   unmarkArticleFavourite,
   getTopicArticles,
+  createReview,
 };

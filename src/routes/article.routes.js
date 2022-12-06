@@ -1,6 +1,7 @@
 import express from "express";
 import {
   createArticle,
+  createReview,
   deleteArticle,
   getFeed,
   getSingleArticle,
@@ -33,5 +34,6 @@ router.route("/unmarkIrrelevant/:id").patch(protect, unmarkArticleIrrelevant);
 router.route("/markRead/:id").patch(protect, markArticleRead);
 router.route("/markFavourite/:id").patch(protect, markArticleFavourite);
 router.route("/unmarkFavourite/:id").patch(protect, unmarkArticleFavourite);
+router.route("/addReview/:id").post(protect, createReview);
 
 export default router;

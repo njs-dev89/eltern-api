@@ -1,5 +1,20 @@
 import { model, Schema } from "mongoose";
 
+const reviewSchema = new Schema(
+  {
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    comment: { type: String, required: true },
+    rating: { type: Number, required: true, min: 0, max: 5 },
+  },
+  {
+    timestamps: true,
+  }
+);
+
 const articleSchema = new Schema(
   {
     title: {
@@ -58,6 +73,9 @@ const articleSchema = new Schema(
       required: true,
       default: false,
     },
+    reviews: [{ type: reviewSchema }],
+    numReviews: { type: Number },
+    rating: { type: Number },
   },
   {
     timestamps: true,

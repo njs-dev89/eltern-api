@@ -25,8 +25,8 @@ const createTask = asyncHandler(async (req, res) => {
   }
   const taskStatusData = {
     taskId: task._id,
-    start: task.recommendedStart,
-    end: task.recommendedEnd,
+    // start: task.recommendedStart,
+    // end: task.recommendedEnd,
     status: "Open",
     user: req.user._id,
   };
@@ -77,11 +77,15 @@ const customizeTask = asyncHandler(async (req, res) => {
   console.log(id);
   const taskStatusData = {
     taskId: id,
-    start: req.body.start,
-    end: req.body.end,
+    // start: req.body.start,
+    // end: req.body.end,
     status: req.body.status,
     user: req.user._id,
   };
+  if (req.body.start && req.body.end) {
+    taskStatusData.start = req.body.start;
+    taskStatusData.end = req.body.end;
+  }
   if (req.body.noteText) {
     taskStatusData.note.text = req.body.noteText;
     delete req.body.noteText;
