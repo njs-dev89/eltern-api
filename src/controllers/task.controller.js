@@ -1,6 +1,37 @@
 import asyncHandler from "express-async-handler";
+import multer from "multer";
+import Jimp from "jimp";
 import Task from "../models/task.model.js";
 import TaskStatus from "../models/taskStatus.model.js";
+
+const imageUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 1024 * 1024 * 3,
+  },
+  fileFilter: (req, file, next) => {
+    if (file.mimetype.startsWith("image/")) {
+      next(null, true);
+    } else {
+      next(null, false);
+    }
+  },
+}).single("img");
+
+const resizeImg = asyncHandler(async (req, res, next) => {
+  if (!req.file) {
+    return next();
+  }
+
+  const extension = req.file.mimetype.split("/")[1];
+  req.body.noteImg = `/uploads/tasks/${
+    req.user.username
+  }-${Date.now()}.${extension}`;
+  const image = await Jimp.read(req.file.buffer);
+  await image.resize(250, Jimp.AUTO);
+  await image.write(`./src/static/${req.body.noteImg}`);
+  next();
+});
 
 const createTask = asyncHandler(async (req, res) => {
   let noteText = req.body.noteText;
@@ -29,6 +60,7 @@ const createTask = asyncHandler(async (req, res) => {
     // end: task.recommendedEnd,
     status: "Open",
     user: req.user._id,
+    note: {},
   };
   if (noteText) {
     taskStatusData.note.text = noteText;
@@ -81,6 +113,7 @@ const customizeTask = asyncHandler(async (req, res) => {
     // end: req.body.end,
     status: req.body.status,
     user: req.user._id,
+    note: {},
   };
   if (req.body.start && req.body.end) {
     taskStatusData.start = req.body.start;
@@ -95,7 +128,9 @@ const customizeTask = asyncHandler(async (req, res) => {
     delete req.body.noteImg;
   }
   if (statusId) {
-    taskStatus = await TaskStatus.findByIdAndUpdate(statusId, taskStatusData);
+    taskStatus = await TaskStatus.findByIdAndUpdate(statusId, taskStatusData, {
+      new: true,
+    });
   } else {
     taskStatus = await TaskStatus.create(taskStatusData);
   }
@@ -249,6 +284,8 @@ const getSingleTask = asyncHandler(async (req, res) => {
 });
 
 export {
+  imageUpload,
+  resizeImg,
   createTask,
   getTasks,
   getSingleTask,
