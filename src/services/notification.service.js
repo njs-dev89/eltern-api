@@ -9,7 +9,7 @@ const generateIdHash = (id) => {
   return hmac.digest("hex");
 };
 
-const sendMessageNotification = (message) => {
+const sendNotification = async (message) => {
   const options = {
     method: "POST",
     url: "https://onesignal.com/api/v1/notifications",
@@ -25,15 +25,15 @@ const sendMessageNotification = (message) => {
       headings: { en: message.heading },
     },
   };
-
-  axios
-    .request(options)
-    .then(function (response) {
-      console.log(response.data);
-    })
-    .catch(function (error) {
-      console.error(error);
-    });
+  if (message.imageUrl) {
+    options.data.big_picture = message.imageUrl;
+    options.data.ios_attachments = { id1: message.imageUrl };
+  }
+  try {
+    return axios.request(options);
+  } catch (e) {
+    console.log(e);
+  }
 };
 
-export { generateIdHash, sendMessageNotification };
+export { generateIdHash, sendNotification };

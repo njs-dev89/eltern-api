@@ -6,6 +6,11 @@ import generateToken from "../utils/generateToken.js";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import Notification from "../models/notification.model.js";
+import {
+  cancelFeedNotifications,
+  scheduleFeedNotifications,
+} from "../services/schedule.service.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -127,6 +132,50 @@ const getAllUsers = asyncHandler(async (req, res) => {
   }
   res.json({ success: true, data: users, message: null });
 });
+
+const setLastActive = asyncHandler(async (req, res) => {
+  const date = new Date();
+
+  const updatedUser = await User.findByIdAndUpdate(
+    req.user._id,
+    { lastActive: date },
+    { new: true }
+  );
+  if (!req.user.enableNotifications) {
+    return res.json({ success: true, data: updatedUser, message: null });
+  }
+  date.setDate(7 + date.getDate());
+  const notification = await Notification.findOneAndUpdate(
+    { user: req.user._id, type: "feed" },
+    { user: req.user._id, type: "feed", time: date },
+    { upsert: true }
+  );
+
+  scheduleFeedNotifications(
+    notification._id.toString(),
+    req.user._id.toString(),
+    date
+  );
+
+  res.json({ success: true, data: updatedUser, message: null });
+});
+
+const toggleEnableNotification = asyncHandler(async (req, res) => {
+  if (req.user.enableNotifications) {
+    const notification = await Notification.findOneAndDelete({
+      user: req.user._id,
+      type: "feed",
+    });
+    cancelFeedNotifications(notification._id.toString());
+  }
+  const updatedUser = await User.findByIdAndUpdate(
+    req.user._id,
+    { enableNotifications: !req.user.enableNotifications },
+    { new: true }
+  );
+
+  res.json({ success: true, data: updatedUser, message: null });
+});
 export {
   registerUser,
   authUser,
@@ -136,4 +185,6 @@ export {
   uploadAvatar,
   resizeAvatar,
   updateUserProfile,
+  setLastActive,
+  toggleEnableNotification,
 };

@@ -39,6 +39,9 @@ const userSchema = new Schema(
       required: true,
       default: true,
     },
+    lastActive: {
+      type: Date,
+    },
     isAdmin: {
       type: Boolean,
       required: true,

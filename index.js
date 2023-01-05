@@ -22,6 +22,10 @@ import messageRoutes from "./src/routes/message.routes.js";
 import { errorHandler, notFound } from "./src/middlewares/error.middleware.js";
 import { generateIdHash } from "./src/services/notification.service.js";
 import { protect } from "./src/middlewares/auth.middleware.js";
+import {
+  scheduleFeedNotifications,
+  scheduleTaskNotifications,
+} from "./src/services/schedule.service.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -42,6 +46,11 @@ app.get("/api/v1/generateIdHash", protect, (req, res) => {
   console.log(hash);
   res.json({ success: true, message: null, data: hash });
 });
+
+// app.get("/api/v1/scheduleFeed", (req, res) => {
+//   scheduleFeedNotifications(42);
+//   res.send("Success!!!");
+// });
 app.use("/api/v1", userRoutes);
 app.use("/api/v1/periods", periodRoutes);
 app.use("/api/v1/topics", topicRoutes);
@@ -61,6 +70,7 @@ io.on("connection", socketHandler);
 
 connectDB(() => {
   server.listen(port, () => {
+    scheduleTaskNotifications();
     console.log(`Server listening on port ${port}`);
   });
 });

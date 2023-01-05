@@ -6,6 +6,8 @@ import {
   getUserProfile,
   registerUser,
   resizeAvatar,
+  setLastActive,
+  toggleEnableNotification,
   updateUserProfile,
   uploadAvatar,
 } from "../controllers/user.controller.js";
@@ -20,6 +22,11 @@ router
   .get(protect, getUserProfile)
   .put(protect, uploadAvatar, resizeAvatar, updateUserProfile)
   .delete(protect, deleteProfile);
+
+router.route("/setLastActive").patch(protect, setLastActive);
+router
+  .route("/toggleEnableNotifications")
+  .patch(protect, toggleEnableNotification);
 
 router.route("/users").get(getAllUsers);
 
